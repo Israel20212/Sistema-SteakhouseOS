@@ -1,0 +1,5 @@
+1 | admin | admin
+2 | waiter | waiter
+3 | kitchen | kitchen
+4 | cashier | cashier
+5 | superadmin | superuser
