@@ -18,7 +18,8 @@ export const useCartStore = defineStore('cart', () => {
     });
 
     function addItem(product: any) {
-        const existing = items.value.find(i => i.product.id === product.id);
+        if (!product || !product.id) return;
+        const existing = items.value.find(i => i.product?.id === product.id);
         if (existing) {
             existing.quantity++;
         } else {
@@ -29,10 +30,13 @@ export const useCartStore = defineStore('cart', () => {
     function removeItem(productId: number) {
         const index = items.value.findIndex(i => i.product.id === productId);
         if (index !== -1) {
-            if (items.value[index].quantity > 1) {
-                items.value[index].quantity--;
-            } else {
-                items.value.splice(index, 1);
+            const item = items.value[index];
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    items.value.splice(index, 1);
+                }
             }
         }
     }

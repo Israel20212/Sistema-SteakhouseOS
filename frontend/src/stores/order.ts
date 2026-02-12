@@ -21,7 +21,8 @@ export const useOrderStore = defineStore('order', () => {
     }
 
     function addItem(product: Product) {
-        const existing = cart.value.find(item => item.product.id === product.id);
+        if (!product || !product.id) return;
+        const existing = cart.value.find(item => item.product?.id === product.id);
         if (existing) {
             existing.quantity++;
         } else {
@@ -32,10 +33,13 @@ export const useOrderStore = defineStore('order', () => {
     function removeItem(productId: number) {
         const index = cart.value.findIndex(item => item.product.id === productId);
         if (index !== -1) {
-            if (cart.value[index].quantity > 1) {
-                cart.value[index].quantity--;
-            } else {
-                cart.value.splice(index, 1);
+            const item = cart.value[index];
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    cart.value.splice(index, 1);
+                }
             }
         }
     }

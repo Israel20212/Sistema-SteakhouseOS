@@ -63,7 +63,7 @@ const handleTableClick = async (table: any) => {
     switch (table.status) {
       case 'free': {
         // Occupy the table
-        const response = await fetch(`${API_URL}/api/tables/${table.id}/occupy`, {
+        await fetch(`${API_URL}/api/tables/${table.id}/occupy`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -85,7 +85,7 @@ const handleTableClick = async (table: any) => {
         
       case 'dirty': {
         // Clean the table
-        const response = await fetch(`${API_URL}/api/tables/${table.id}/clean`, {
+        await fetch(`${API_URL}/api/tables/${table.id}/clean`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });

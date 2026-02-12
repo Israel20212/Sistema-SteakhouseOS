@@ -81,7 +81,7 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
     const publicPages = ['/', '/menu'];
     const authRequired = !publicPages.includes(to.path) && !to.path.startsWith('/menu/');
     const token = sessionStorage.getItem('token');

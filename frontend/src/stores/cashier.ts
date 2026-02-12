@@ -24,6 +24,8 @@ export interface Order {
     createdAt: string;
     Table: Table;
     OrderItems: OrderItem[];
+    order_type?: 'dine-in' | 'takeout' | 'pickup';
+    customer_name?: string;
 }
 
 export const useCashierStore = defineStore('cashier', () => {
