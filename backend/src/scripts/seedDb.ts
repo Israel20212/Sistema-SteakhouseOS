@@ -5,27 +5,42 @@ import bcrypt from 'bcryptjs';
 const seedDatabase = async () => {
     try {
         await sequelize.authenticate();
+        console.log('Authenticated.');
+
         await sequelize.sync({ force: true }); // Reset DB
+        console.log('Database synced (tables dropped and recreated).');
 
         // Users
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash('123456', salt);
 
+        console.log('Seeding users...');
         await User.bulkCreate([
             { username: 'admin', password_hash: password, role: 'admin' },
             { username: 'waiter', password_hash: password, role: 'waiter' },
             { username: 'kitchen', password_hash: password, role: 'kitchen' },
             { username: 'cashier', password_hash: password, role: 'cashier' }
         ]);
+        console.log('Users seeded.');
 
-        // Tables
         const tables = [];
+        // Insert tables one by one to avoid bulk issues and better error tracking
+        console.log('Seeding tables sequentially...');
         for (let i = 1; i <= 10; i++) {
-            tables.push({ number: i, status: 'available' });
+            try {
+                await Table.create({
+                    number: String(i),
+                    status: 'free' // Use 'free' as defined in model ENUM (not 'available')
+                });
+                console.log(`Table ${i} created.`);
+            } catch (err) {
+                console.error(`Failed to create table ${i}:`, err);
+            }
         }
-        await Table.bulkCreate(tables);
+        console.log('Tables seeded.');
 
         // Products
+        console.log('Seeding products...');
         await Product.bulkCreate([
             // Classics
             { name: 'Ribeye Premium 400g', price: 450, category: 'Carnes Premium', is_active: true, is_available: false, image_url: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=800&auto=format&fit=crop' },

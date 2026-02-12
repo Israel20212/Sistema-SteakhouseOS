@@ -107,7 +107,7 @@ const logout = () => {
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <div 
-                v-for="product in productStore.products" 
+                v-for="product in productStore.formattedProducts" 
                 :key="product.id"
                 class="bg-primary-panel border border-white/10 rounded-xl overflow-hidden shadow-lg group hover:border-gold/30 transition-all flex flex-col"
             >
