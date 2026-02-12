@@ -167,12 +167,15 @@ const logout = () => {
                             </span>
                         </td>
                         <td class="p-4 text-right space-x-2">
-                             <button @click="openModal(user)" class="text-blue-400 hover:text-white p-2">
+                             <button v-if="user.role !== 'superuser'" @click="openModal(user)" class="text-blue-400 hover:text-white p-2" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
-                             <button @click="deleteUser(user.id)" class="text-red-400 hover:text-white p-2">
+                             <button v-if="user.role !== 'superuser'" @click="deleteUser(user.id)" class="text-red-400 hover:text-white p-2" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
+                            <span v-else class="text-gray-600 text-xs uppercase font-bold italic pr-2">
+                                <i class="fas fa-lock mr-1"></i> Protegido
+                            </span>
                         </td>
                     </tr>
                 </tbody>

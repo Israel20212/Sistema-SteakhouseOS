@@ -53,6 +53,14 @@ export const updateUser = async (req: Request, res: Response) => {
         const user = await User.findByPk(Number(id));
         if (!user) return res.status(404).json({ message: 'User not found' });
 
+        // PROTECT SUPERUSER: Prevent modification of the root admin
+        if (user.role === 'superuser') {
+            return res.status(403).json({
+                message: 'ACCIÓN DENEGADA: El Superusuario principal no puede ser modificado.',
+                error: 'Forbidden: Cannot update superuser'
+            });
+        }
+
         if (username) user.username = username;
         if (role) user.role = role;
         if (password) {
