@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router';
 const settingsStore = useSettingsStore();
 const authStore = useAuthStore();
 const router = useRouter();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const form = ref({
     restaurant_name: '',
@@ -41,7 +42,7 @@ onMounted(async () => {
 const saveSettings = async () => {
     isSaving.value = true;
     try {
-        const response = await fetch('http://localhost:3000/api/settings', {
+        const response = await fetch(`${API_URL}/api/settings`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -58,32 +59,18 @@ const saveSettings = async () => {
         }
     } catch (e) {
         console.error(e);
-        alert('Error de conexión.');
+        alert('Error de red');
     } finally {
         isSaving.value = false;
     }
 };
 
-const logout = () => {
-    authStore.logout();
-    router.push('/');
-};
-
-const handleFactoryReset = async () => {
-    const confirmation1 = window.confirm('⚠️ ¡ADVERTENCIA CRÍTICA! ⚠️\n\nEstás a punto de BORRAR TODOS LOS DATOS del sistema:\n- Menú Completo\n- Todas las Ventas y Órdenes\n- Configuración de Mesas\n- Marca y Colores Personalizados\n\n¿Estás 100% seguro de querer continuar?');
-    
-    if (!confirmation1) return;
-
-    const confirmation2 = window.prompt('Para confirmar esta acción DESTRUCTIVA, escribe "BORRAR TODO" en el cuadro de abajo:');
-    
-    if (confirmation2 !== 'BORRAR TODO') {
-        alert('Acción cancelada. El texto de confirmación no coincide.');
-        return;
-    }
+const resetSettings = async () => {
+    if(!confirm('¿Estás seguro de restablecer la configuración de fábrica? Se perderán todos los cambios de diseño.')) return;
 
     try {
         const token = sessionStorage.getItem('token');
-        const response = await fetch('http://localhost:3000/api/settings/reset', {
+        const response = await fetch(`${API_URL}/api/settings/reset`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -91,155 +78,114 @@ const handleFactoryReset = async () => {
         });
 
         if (response.ok) {
-            alert('♻️ Restauración completada con éxito.\nEl sistema ha vuelto a su estado original.');
-            // Reload settings and form
-            await settingsStore.fetchSettings();
-            form.value.restaurant_name = settingsStore.restaurantName;
-            form.value.primary_color = settingsStore.primaryColor;
-            form.value.secondary_color = settingsStore.secondaryColor;
-            form.value.accent_color = settingsStore.accentColor;
-            form.value.logo_url = settingsStore.logoUrl || '';
-            form.value.ticket_slogan = settingsStore.ticketSlogan || '';
-            form.value.ticket_address = settingsStore.ticketAddress || '';
-            form.value.ticket_phone = settingsStore.ticketPhone || '';
-            form.value.ticket_footer = settingsStore.ticketFooter || '';
-            form.value.ticket_footer_2 = settingsStore.ticketFooter2 || '';
+            alert('Configuración restablecida. Recargando...');
+            window.location.reload();
         } else {
-            alert('Error al restaurar el sistema.');
+            alert('Error al restablecer');
         }
     } catch (error) {
         console.error(error);
-        alert('Error de conexión.');
+        alert('Error de conexión');
     }
 };
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-900 text-white p-8">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-10">
-                <h1 class="text-3xl font-bold text-gold"> <i class="fas fa-crown mr-2"></i> Panel Superusuario</h1>
-                <button @click="logout" class="bg-red-600 px-4 py-2 rounded font-bold">Cerrar Sesión</button>
-            </div>
-
-            <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
-                <h2 class="text-xl font-bold mb-6">Identidad del Restaurante (White-Label)</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-gray-400 mb-2">Nombre del Restaurante</label>
-                        <input v-model="form.restaurant_name" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. Tacos Don Juan">
-                    </div>
-                    
-                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-gray-400 mb-2">Color Primario (Fondos)</label>
-                            <div class="flex">
-                                <input v-model="form.primary_color" type="color" class="h-12 w-12 rounded border-none bg-transparent mr-3 cursor-pointer">
-                                <input v-model="form.primary_color" type="text" class="flex-1 bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-2">Color Secundario (Textos)</label>
-                            <div class="flex">
-                                <input v-model="form.secondary_color" type="color" class="h-12 w-12 rounded border-none bg-transparent mr-3 cursor-pointer">
-                                <input v-model="form.secondary_color" type="text" class="flex-1 bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-2">Color de Acento (Botones)</label>
-                            <div class="flex">
-                                <input v-model="form.accent_color" type="color" class="h-12 w-12 rounded border-none bg-transparent mr-3 cursor-pointer">
-                                <input v-model="form.accent_color" type="text" class="flex-1 bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-gray-400 mb-2">Logo URL (Imagen)</label>
-                        <input v-model="form.logo_url" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="https://example.com/logo.png">
-                    </div>
-                </div>
-
-                <!-- Ticket Customization Section -->
-                <div class="mt-8 pt-8 border-t border-gray-700">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-receipt"></i>
-                        Personalización de Tickets
-                    </h2>
-                    <p class="text-sm text-gray-400 mb-6">Estos valores aparecerán en los tickets impresos</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-gray-400 mb-2">Eslogan / Subtítulo</label>
-                            <input v-model="form.ticket_slogan" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. Prime Cuts & Drinks" maxlength="100">
-                            <p class="text-xs text-gray-500 mt-1">Aparece debajo del nombre del restaurante</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-400 mb-2">Dirección</label>
-                            <input v-model="form.ticket_address" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. Calle Principal #123" maxlength="200">
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-400 mb-2">Teléfono (Opcional)</label>
-                            <input v-model="form.ticket_phone" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. Tel: (123) 456-7890" maxlength="50">
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-400 mb-2">Mensaje de Despedida 1</label>
-                            <input v-model="form.ticket_footer" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. ¡Gracias por su visita!" maxlength="100">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-400 mb-2">Mensaje de Despedida 2 (Opcional)</label>
-                            <input v-model="form.ticket_footer_2" type="text" class="w-full bg-gray-900 border border-gray-700 p-3 rounded text-white focus:border-gold outline-none" placeholder="Ej. Propina no incluida" maxlength="100">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 flex justify-end">
-                    <button @click="saveSettings" :disabled="isSaving" class="bg-gold text-black font-bold py-3 px-8 rounded hover:bg-yellow-500 disabled:opacity-50">
-                        {{ isSaving ? 'Guardando...' : 'Aplicar Cambios' }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Danger Zone -->
-            <div class="mt-8 border border-red-900/50 rounded-xl bg-red-950/10 p-8">
-                <div class="flex items-start">
-                    <div class="text-red-500 mr-4 mt-1">
-                        <i class="fas fa-exclamation-triangle text-2xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-serif font-bold text-red-500 mb-2">Zona de Peligro</h3>
-                        <p class="text-gray-400 text-sm mb-6">
-                            Estas acciones son destructivas y no se pueden deshacer. Tenga precaución.
-                        </p>
-                        
-                        <div class="flex items-center justify-between bg-black/40 p-4 rounded-lg border border-red-900/30">
-                            <div>
-                                <h4 class="text-white font-bold">Restauración de Fábrica Inteligente</h4>
-                                <p class="text-xs text-gray-400 mt-1">Borra Menú, Ventas y Mesas. Mantiene Usuarios.</p>
-                            </div>
-                            <button 
-                                @click="handleFactoryReset"
-                                class="py-2 px-4 bg-red-900/50 hover:bg-red-600 text-red-200 hover:text-white font-bold text-xs uppercase rounded border border-red-800 transition-colors"
-                            >
-                                Restaurar Sistema
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8 bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 opacity-50 relative pointer-events-none">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="bg-black/50 px-4 py-2 rounded font-bold uppercase tracking-widest text-sm border border-white/20">Próximamente</span>
-                </div>
-                <h2 class="text-xl font-bold mb-4">Gestión de Suscripciones</h2>
-                <p class="text-gray-400">Aquí podrás activar/desactivar el servicio para clientes morosos.</p>
-            </div>
+  <div class="min-h-screen bg-primary pb-20 font-sans text-white">
+    
+    <header class="bg-primary-panel border-b border-white/10 p-4 sticky top-0 z-20 backdrop-blur-md bg-opacity-90 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl text-gold font-bold font-serif">Panel de Control</h1>
+            <p class="text-xs text-gray-500">Configuración global del sistema</p>
         </div>
+        <div class="flex space-x-3">
+             <button @click="router.push('/dashboard')" class="border border-gold/50 text-gold px-4 py-2 rounded font-bold text-sm hover:bg-gold/10">
+                <i class="fas fa-arrow-left mr-1"></i> Ir a POS
+            </button>
+            <button @click="authStore.logout()" class="text-red-400 border border-red-900/50 px-3 py-2 rounded hover:bg-red-900/20 text-sm">
+                Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="p-6 max-w-4xl mx-auto space-y-8">
+        
+        <!-- Branding Section -->
+        <section class="bg-primary-panel border border-white/10 rounded-xl p-6 shadow-lg">
+            <h2 class="text-lg font-bold mb-4 text-gold border-b border-white/5 pb-2">Identidad de Marca</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Nombre del Restaurante</label>
+                    <input v-model="form.restaurant_name" type="text" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">URL del Logo</label>
+                    <input v-model="form.logo_url" type="text" placeholder="https://..." class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Color Primario</label>
+                    <div class="flex items-center space-x-2">
+                        <input v-model="form.primary_color" type="color" class="h-10 w-10 rounded cursor-pointer border-none bg-transparent" />
+                        <span class="text-xs font-mono text-gray-400">{{ form.primary_color }}</span>
+                    </div>
+                </div>
+                 <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Color Secundario</label>
+                    <div class="flex items-center space-x-2">
+                        <input v-model="form.secondary_color" type="color" class="h-10 w-10 rounded cursor-pointer border-none bg-transparent" />
+                        <span class="text-xs font-mono text-gray-400">{{ form.secondary_color }}</span>
+                    </div>
+                </div>
+                 <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Color Acento (Gold)</label>
+                    <div class="flex items-center space-x-2">
+                        <input v-model="form.accent_color" type="color" class="h-10 w-10 rounded cursor-pointer border-none bg-transparent" />
+                        <span class="text-xs font-mono text-gray-400">{{ form.accent_color }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ticket Customization Section -->
+        <section class="bg-primary-panel border border-white/10 rounded-xl p-6 shadow-lg">
+            <h2 class="text-lg font-bold mb-4 text-gold border-b border-white/5 pb-2">Personalización de Tickets</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-2">
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Slogan del Restaurante</label>
+                    <input v-model="form.ticket_slogan" type="text" placeholder="Ej: Prime Cuts & Drinks" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Dirección</label>
+                    <input v-model="form.ticket_address" type="text" placeholder="Ej: Calle Principal #123" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Teléfono</label>
+                    <input v-model="form.ticket_phone" type="text" placeholder="Ej: 555-0199" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Mensaje Pie de Página 1</label>
+                    <input v-model="form.ticket_footer" type="text" placeholder="Ej: ¡Gracias por su visita!" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Mensaje Pie de Página 2</label>
+                    <input v-model="form.ticket_footer_2" type="text" placeholder="Ej: Propina no incluida" class="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                </div>
+            </div>
+        </section>
+        
+        <div class="flex justify-end space-x-4">
+             <button @click="resetSettings" class="px-6 py-3 rounded font-bold text-gray-400 hover:text-white hover:bg-white/5 transition">
+                Restablecer Fábrica
+            </button>
+            <button @click="saveSettings" :disabled="isSaving" class="bg-gold hover:bg-yellow-500 text-black px-8 py-3 rounded font-bold shadow-lg transition transform active:scale-95 disabled:opacity-50">
+                {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+        </div>
+
     </div>
+
+  </div>
 </template>

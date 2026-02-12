@@ -8,6 +8,7 @@ import { socket } from '../../socket';
 const tableStore = useTableStore();
 const authStore = useAuthStore();
 const router = useRouter();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const roleLabel = computed(() => {
   switch (authStore.user?.role) {
@@ -62,7 +63,7 @@ const handleTableClick = async (table: any) => {
     switch (table.status) {
       case 'free':
         // Occupy the table
-        await fetch(`http://localhost:3000/api/tables/${table.id}/occupy`, {
+      const response = await fetch(`${API_URL}/api/tables/${table.id}/occupy`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -83,7 +84,7 @@ const handleTableClick = async (table: any) => {
         
       case 'dirty':
         // Clean the table
-        await fetch(`http://localhost:3000/api/tables/${table.id}/clean`, {
+      const response = await fetch(`${API_URL}/api/tables/${table.id}/clean`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });

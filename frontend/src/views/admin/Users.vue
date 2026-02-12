@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
 const router = useRouter();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface User {
     id: number;
@@ -29,7 +30,7 @@ onMounted(() => {
 
 const fetchUsers = async () => {
     try {
-        const response = await fetch('http://localhost:3000/api/users', {
+        const response = await fetch(`${API_URL}/api/users`, {
             headers: { 'Authorization': `Bearer ${authStore.token}` }
         });
         if (response.ok) users.value = await response.json();
@@ -63,8 +64,8 @@ const saveUser = async () => {
 
     try {
         const url = isEditing.value 
-            ? `http://localhost:3000/api/users/${editingId.value}`
-            : 'http://localhost:3000/api/users';
+            ? `${API_URL}/api/users/${editingId.value}`
+            : `${API_URL}/api/users`;
         
         const method = isEditing.value ? 'PUT' : 'POST';
 
@@ -96,7 +97,7 @@ const saveUser = async () => {
 const deleteUser = async (id: number) => {
     if(!confirm('¿Seguro que deseas eliminar este usuario?')) return;
     try {
-        const response = await fetch(`http://localhost:3000/api/users/${id}`, {
+        const response = await fetch(`${API_URL}/api/users/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authStore.token}` }
         });

@@ -29,10 +29,11 @@ export interface Order {
 export const useCashierStore = defineStore('cashier', () => {
     const orders = ref<Order[]>([]);
     const authStore = useAuthStore();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     async function fetchActiveOrders() {
         try {
-            const response = await fetch('http://localhost:3000/api/orders/active', {
+            const response = await fetch(`${API_URL}/api/orders/active`, {
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
                 }
@@ -47,7 +48,7 @@ export const useCashierStore = defineStore('cashier', () => {
 
     async function payOrder(orderId: number) {
         try {
-            const response = await fetch(`http://localhost:3000/api/orders/${orderId}/pay`, {
+            const response = await fetch(`${API_URL}/api/orders/${orderId}/pay`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`

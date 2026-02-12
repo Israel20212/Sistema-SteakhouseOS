@@ -7,6 +7,7 @@ export const useSettingsStore = defineStore('settings', () => {
     const secondaryColor = ref('#FFFFFF');
     const accentColor = ref('#D4AF37');
     const logoUrl = ref<string | null>(null);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     // Ticket customization fields
     const ticketSlogan = ref('Prime Cuts & Drinks');
@@ -17,7 +18,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
     async function fetchSettings() {
         try {
-            const response = await fetch('http://localhost:3000/api/settings');
+            const response = await fetch(`${API_URL}/api/settings`);
             if (response.ok) {
                 const data = await response.json();
                 restaurantName.value = data.restaurant_name;

@@ -11,6 +11,7 @@ const productStore = useProductStore();
 const orderStore = useOrderStore();
 const authStore = useAuthStore(); // Added authStore usage
 const token = authStore.token;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const tableId = Number(route.params.id);
 const selectedCategory = ref('');
@@ -25,7 +26,7 @@ onMounted(async () => {
   
   // Fetch table status
   try {
-    const response = await fetch(`http://localhost:3000/api/tables`, {
+    const response = await fetch(`${API_URL}/api/tables`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (response.ok) {
@@ -59,7 +60,7 @@ const sendToKitchen = async () => {
       quantity: item.quantity
     }));
 
-    const response = await fetch('http://localhost:3000/api/orders', {
+    const response = await fetch(`${API_URL}/api/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ const requestPayment = async () => {
   if (!confirmRequest) return;
   
   try {
-    const response = await fetch(`http://localhost:3000/api/tables/${tableId}/request-payment`, {
+    const response = await fetch(`${API_URL}/api/tables/${tableId}/request-payment`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });

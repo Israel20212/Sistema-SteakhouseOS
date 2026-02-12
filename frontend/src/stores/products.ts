@@ -17,6 +17,7 @@ export interface Product {
 export const useProductStore = defineStore('products', () => {
     const products = ref<Product[]>([]);
     const authStore = useAuthStore();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     const formattedProducts = computed(() => {
         return products.value.map(p => ({
@@ -32,7 +33,7 @@ export const useProductStore = defineStore('products', () => {
 
     async function fetchProducts() {
         try {
-            const response = await fetch('http://localhost:3000/api/products', {
+            const response = await fetch(`${API_URL}/api/products`, {
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
                 }
@@ -47,7 +48,7 @@ export const useProductStore = defineStore('products', () => {
 
     async function addProduct(productData: Partial<Product>) {
         try {
-            const response = await fetch('http://localhost:3000/api/products', {
+            const response = await fetch(`${API_URL}/api/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ export const useProductStore = defineStore('products', () => {
 
     async function updateProduct(id: number, productData: Partial<Product>) {
         try {
-            const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+            const response = await fetch(`${API_URL}/api/products/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ export const useProductStore = defineStore('products', () => {
 
     async function deleteProduct(id: number) {
         try {
-            const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+            const response = await fetch(`${API_URL}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
@@ -112,7 +113,7 @@ export const useProductStore = defineStore('products', () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/products/${id}/availability`, {
+            const response = await fetch(`${API_URL}/api/products/${id}/availability`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
@@ -136,18 +137,19 @@ export const useProductStore = defineStore('products', () => {
         }
     }
 
-    // Real-time updates
+    // Listen for real-time updates
     socket.on('product_updated', (updatedProduct: Product) => {
         const index = products.value.findIndex(p => p.id === updatedProduct.id);
         if (index !== -1) {
             products.value[index] = updatedProduct;
-        } else if (updatedProduct.is_active) {
+        } else {
             products.value.push(updatedProduct);
         }
     });
 
     return {
-        products: formattedProducts,
+        products,
+        formattedProducts,
         categories,
         fetchProducts,
         addProduct,

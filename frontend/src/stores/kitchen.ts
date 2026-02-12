@@ -30,10 +30,11 @@ export interface Order {
 export const useKitchenStore = defineStore('kitchen', () => {
     const orders = ref<Order[]>([]);
     const authStore = useAuthStore();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     async function fetchOrders() {
         try {
-            const response = await fetch('http://localhost:3000/api/orders', {
+            const response = await fetch(`${API_URL}/api/orders`, {
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
                 }
@@ -48,7 +49,7 @@ export const useKitchenStore = defineStore('kitchen', () => {
 
     async function updateOrderStatus(orderId: number, status: 'cooking' | 'ready' | 'served') {
         try {
-            const response = await fetch(`http://localhost:3000/api/orders/${orderId}/status`, {
+            const response = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,7 +60,6 @@ export const useKitchenStore = defineStore('kitchen', () => {
 
             if (response.ok) {
                 // Optimistic update or wait for socket event
-                // We'll rely on socket event to update the list to avoid duplicate logic
                 return true;
             }
             return false;

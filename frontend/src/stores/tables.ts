@@ -13,11 +13,12 @@ export const useTableStore = defineStore('tables', () => {
     const tables = ref<Table[]>([]);
     const isLoading = ref(false);
     const authStore = useAuthStore();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     async function fetchTables() {
         isLoading.value = true;
         try {
-            const response = await fetch('http://localhost:3000/api/tables', {
+            const response = await fetch(`${API_URL}/api/tables`, {
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
                 }
@@ -40,7 +41,7 @@ export const useTableStore = defineStore('tables', () => {
 
     async function addTable() {
         try {
-            const response = await fetch('http://localhost:3000/api/tables', {
+            const response = await fetch(`${API_URL}/api/tables`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
@@ -55,7 +56,7 @@ export const useTableStore = defineStore('tables', () => {
     async function deleteTable(id: number) {
         if (!confirm('¿Seguro que deseas eliminar esta mesa?')) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/tables/${id}`, {
+            const response = await fetch(`${API_URL}/api/tables/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authStore.token}`
