@@ -61,14 +61,15 @@ const handleTableClick = async (table: any) => {
   
   try {
     switch (table.status) {
-      case 'free':
+      case 'free': {
         // Occupy the table
-      const response = await fetch(`${API_URL}/api/tables/${table.id}/occupy`, {
+        const response = await fetch(`${API_URL}/api/tables/${table.id}/occupy`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
         showNotification(`Mesa ${table.number} marcada como ocupada`);
         break;
+      }
         
       case 'occupied':
       case 'waiting_food':
@@ -82,14 +83,15 @@ const handleTableClick = async (table: any) => {
         router.push(`/waiter/table/${table.id}/order`);
         break;
         
-      case 'dirty':
+      case 'dirty': {
         // Clean the table
-      const response = await fetch(`${API_URL}/api/tables/${table.id}/clean`, {
+        const response = await fetch(`${API_URL}/api/tables/${table.id}/clean`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
         showNotification(`Mesa ${table.number} limpiada y lista`);
         break;
+      }
     }
   } catch (error) {
     console.error('Error handling table action:', error);

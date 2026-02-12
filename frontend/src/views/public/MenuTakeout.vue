@@ -60,7 +60,7 @@ const sendOrder = async () => {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            await response.json();
             orderStatus.value = 'success';
             cartStore.clearCart();
             customerName.value = '';
