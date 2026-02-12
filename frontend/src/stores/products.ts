@@ -108,7 +108,7 @@ export const useProductStore = defineStore('products', () => {
     async function toggleAvailability(id: number) {
         // Optimistic update
         const index = products.value.findIndex(p => p.id === id);
-        if (index !== -1) {
+        if (index !== -1 && products.value[index]) {
             products.value[index].is_available = !products.value[index].is_available;
         }
 
@@ -122,7 +122,7 @@ export const useProductStore = defineStore('products', () => {
 
             if (!response.ok) {
                 // Revert if failed
-                if (index !== -1) {
+                if (index !== -1 && products.value[index]) {
                     products.value[index].is_available = !products.value[index].is_available;
                 }
             }
@@ -130,7 +130,7 @@ export const useProductStore = defineStore('products', () => {
         } catch (error) {
             console.error(error);
             // Revert on error
-            if (index !== -1) {
+            if (index !== -1 && products.value[index]) {
                 products.value[index].is_available = !products.value[index].is_available;
             }
             return false;
