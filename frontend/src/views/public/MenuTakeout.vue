@@ -18,7 +18,7 @@ const customerName = ref('');
 const categories = computed(() => ['Todos', ...productStore.categories]);
 
 const filteredProducts = computed(() => {
-    let prods = productStore.products.filter(p => p.is_active && p.is_available);
+    let prods = productStore.formattedProducts.filter(p => p.is_active && p.is_available);
     if (selectedCategory.value !== 'Todos') {
         prods = prods.filter(p => p.category === selectedCategory.value);
     }

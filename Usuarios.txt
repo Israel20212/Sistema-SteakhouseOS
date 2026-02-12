@@ -1,6 +1,6 @@
 ID	Usuario	           Rol	       Contraseña (Dev)
-1	admin	          admin  	123
-2	waiter	         waiter  	123
-3	kitchen         kitchen	        123
-4	cashier	        cashier	        123
-5	superadmin	superuser	123
+1	admin	          admin  	123456
+2	waiter	         waiter  	123456
+3	kitchen         kitchen	        123456
+4	cashier	        cashier	        123456
+5	superadmin	superuser	superuser123
