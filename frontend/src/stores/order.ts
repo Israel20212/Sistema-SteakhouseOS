@@ -12,7 +12,7 @@ export const useOrderStore = defineStore('order', () => {
     const cart = ref<CartItem[]>([]);
 
     const total = computed(() => {
-        return cart.value.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+        return cart.value.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
     });
 
     function setTable(tableId: number) {

@@ -40,8 +40,8 @@ onMounted(async () => {
 });
 
 const filteredProducts = computed(() => {
-  if (!selectedCategory.value) return productStore.products;
-  return productStore.products.filter(p => p.category === selectedCategory.value);
+  if (!selectedCategory.value) return productStore.formattedProducts;
+  return productStore.formattedProducts.filter(p => p.category === selectedCategory.value);
 });
 
 const goBack = () => {
