@@ -9,6 +9,7 @@ const productStore = useProductStore();
 const cartStore = useCartStore();
 import { useSettingsStore } from '../../stores/settings';
 const settingsStore = useSettingsStore();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 onMounted(async () => {
     await settingsStore.fetchSettings();
@@ -67,7 +68,7 @@ const sendOrder = async () => {
 
         if (isTakeoutMode.value) {
             // Takeout mode - no table
-            endpoint = 'http://localhost:3000/api/orders/takeout';
+            endpoint = `${API_URL}/api/orders/takeout`;
             payload = {
                 items: cartStore.items.map(i => ({
                     productId: i.product.id,
@@ -77,7 +78,7 @@ const sendOrder = async () => {
             };
         } else {
             // Dine-in mode - with table
-            endpoint = 'http://localhost:3000/api/orders/public';
+            endpoint = `${API_URL}/api/orders/public`;
             payload = {
                 tableId: tableId.value,
                 items: cartStore.items.map(i => ({

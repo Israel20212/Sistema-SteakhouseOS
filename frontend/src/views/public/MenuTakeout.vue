@@ -7,6 +7,7 @@ import { useSettingsStore } from '../../stores/settings';
 const productStore = useProductStore();
 const cartStore = useCartStore();
 const settingsStore = useSettingsStore();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const selectedCategory = ref('Todos');
 const activeProduct = ref<any>(null);
@@ -52,7 +53,7 @@ const sendOrder = async () => {
             customer_name: customerName.value.trim() || null
         };
 
-        const response = await fetch('http://localhost:3000/api/orders/takeout', {
+        const response = await fetch(`${API_URL}/api/orders/takeout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
